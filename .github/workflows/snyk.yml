@@ -1,0 +1,29 @@
+name: Snyk Security
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  snyk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Installer Java
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # Installer Snyk CLI globalement
+      - name: Install Snyk
+        run: npm install -g snyk
+
+      # Exécuter Snyk via Maven dans le sous-dossier
+      - name: Run Snyk Test
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: |
+          cd project
+          snyk test --all-projects
