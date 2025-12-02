@@ -26,8 +26,8 @@ create table signature(
 
 create table logs(
     id_log int auto_increment primary key,
-    id_user int not null,
-    act text,
-    result text,
-    foreign key (id_user) references User(id_user)
+    name_user varchar(255)not null,
+    act text not null,
+    date_time datetime not null,
+    result text
 );
