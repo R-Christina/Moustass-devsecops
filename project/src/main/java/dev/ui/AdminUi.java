@@ -1,13 +1,34 @@
 package dev.ui;
 
+import dev.ui.AddUserUi;
+import dev.unit.Connexion;
+
 import javax.swing.*;
 import java.awt.*;
+import java.sql.Connection;
 
 public class AdminUi 
 {
 
     public static void main(String[] args) 
     {
+
+        // ===== CONNEXION À LA BASE =====
+        final Connection conn; // ⬅ final = corrige le warning
+
+        try 
+        {
+            conn = Connexion.getConnection();
+        } catch (Exception ex) 
+        {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Impossible de se connecter à la base de données.\n" + ex.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE
+            );
+            return; // stop l'exécution
+        }
 
         // ===== FENÊTRE =====
         JFrame frame = new JFrame("Administrateur");
@@ -42,7 +63,7 @@ public class AdminUi
 
         frame.add(header, BorderLayout.NORTH);
 
-        // ===== CENTER PANEL (changeable area) =====
+        // ===== CENTER PANEL =====
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.setBackground(Color.WHITE);
         frame.add(centerPanel, BorderLayout.CENTER);
@@ -67,26 +88,26 @@ public class AdminUi
 
         // ===== ACTIONS =====
 
-       
-
-        // > Navigation : Créer Utilisateur
+        // --- Page : Créer un utilisateur
         btnCreateUser.addActionListener(e -> {
             centerPanel.removeAll();
-            centerPanel.add(new AddUserUi(), BorderLayout.CENTER);
+            centerPanel.add(new AddUserUi(conn), BorderLayout.CENTER);  // ✔ OK
             centerPanel.revalidate();
             centerPanel.repaint();
         });
 
-        // > Navigation : Liste Fichiers
+        // --- Page : Liste des fichiers
         btnListe.addActionListener(e -> {
             centerPanel.removeAll();
+            centerPanel.add(new JLabel("Page : Liste des fichiers"), BorderLayout.CENTER);
             centerPanel.revalidate();
             centerPanel.repaint();
         });
 
-        // > Navigation : Logs
+        // --- Page : Logs
         btnLogs.addActionListener(e -> {
             centerPanel.removeAll();
+            centerPanel.add(new JLabel("Page : Logs"), BorderLayout.CENTER);
             centerPanel.revalidate();
             centerPanel.repaint();
         });
