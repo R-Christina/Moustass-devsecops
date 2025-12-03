@@ -9,23 +9,26 @@ import java.sql.Connection;
 
 public class AdminUi {
 
-    private JFrame frame;
-    private JPanel centerPanel;
+    private final JFrame frame;
+    private final JPanel centerPanel;
     private final Connection conn;
     private final int adminId;
 
-    // ===== CONSTRUCTEUR OFFICIEL =====
+    // ===== CONSTRUCTEUR =====
     public AdminUi(int adminId, Connection conn) {
         this.adminId = adminId;
         this.conn = conn;
+
+        frame = new JFrame("Administrateur");
+        centerPanel = new JPanel(new BorderLayout());
+
         initUI();
     }
 
-    // ===== INTERFACE =====
+    // ===== INITIALISATION DE L'INTERFACE =====
     private void initUI() {
 
         // ===== FENÊTRE =====
-        frame = new JFrame("Administrateur");
         frame.setSize(900, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
@@ -39,20 +42,18 @@ public class AdminUi {
         JLabel title = new JLabel("Admin", SwingConstants.CENTER);
         title.setFont(new Font("Segoe UI", Font.BOLD, 22));
         title.setForeground(Color.WHITE);
-        header.add(title, BorderLayout.CENTER);
 
+        header.add(title, BorderLayout.CENTER);
         frame.add(header, BorderLayout.NORTH);
 
         // ===== CENTER PANEL =====
-        centerPanel = new JPanel(new BorderLayout());
         centerPanel.setBackground(Color.WHITE);
         frame.add(centerPanel, BorderLayout.CENTER);
 
         // ===== SIDEBAR =====
-        JPanel sidebar = new JPanel();
+        JPanel sidebar = new JPanel(new GridLayout(10, 1, 0, 10));
         sidebar.setPreferredSize(new Dimension(200, 0));
         sidebar.setBackground(new Color(245, 245, 245));
-        sidebar.setLayout(new GridLayout(10, 1, 0, 10));
         sidebar.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
 
         JButton btnListe = menuButton("Liste Fichiers");
@@ -67,16 +68,8 @@ public class AdminUi {
 
         // ===== ACTIONS =====
         btnCreateUser.addActionListener(e -> showPage(new AddUserUi(conn)));
-
-        btnListe.addActionListener(e -> {
-            JLabel page = new JLabel("Page : Liste des fichiers", SwingConstants.CENTER);
-            showPage(page);
-        });
-
-        btnLogs.addActionListener(e -> {
-            JLabel page = new JLabel("Page : Logs", SwingConstants.CENTER);
-            showPage(page);
-        });
+        btnListe.addActionListener(e -> showPage(new FilesUi(conn)));
+        btnLogs.addActionListener(e -> showPage(new LogsUi(conn)));
 
         frame.setVisible(true);
     }
@@ -100,13 +93,11 @@ public class AdminUi {
         return btn;
     }
 
-    // ===== MAIN TEMPORAIRE POUR TEST =====
+    // ===== MAIN DE TEST =====
     public static void main(String[] args) {
-
         try {
             Connection conn = Connexion.getConnection();
             int fakeAdminId = 1; // ID d’admin pour test
-
             new AdminUi(fakeAdminId, conn);
 
         } catch (Exception ex) {

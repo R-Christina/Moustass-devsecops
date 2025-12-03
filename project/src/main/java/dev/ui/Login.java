@@ -13,8 +13,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-public class Login extends JFrame 
-{
+public class Login extends JFrame {
 
     public Login() {
         super("Authentification");
@@ -51,7 +50,8 @@ public class Login extends JFrame
         JTextField inputNom = new JTextField(15);
         styleTextField(inputNom);
 
-        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         card.add(labelNom, gbc);
         gbc.gridx = 1;
         card.add(inputNom, gbc);
@@ -60,7 +60,8 @@ public class Login extends JFrame
         JPasswordField inputPass = new JPasswordField(15);
         styleTextField(inputPass);
 
-        gbc.gridx = 0; gbc.gridy = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         card.add(labelPass, gbc);
         gbc.gridx = 1;
         card.add(inputPass, gbc);
@@ -77,12 +78,15 @@ public class Login extends JFrame
             public void mouseEntered(MouseEvent e) {
                 loginButton.setBackground(new Color(90, 25, 180));
             }
+
             public void mouseExited(MouseEvent e) {
                 loginButton.setBackground(new Color(125, 41, 219));
             }
         });
 
-        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2;
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
         card.add(loginButton, gbc);
 

@@ -1,6 +1,8 @@
 package dev.back.hash;
 
+import java.io.FileInputStream;
 import java.security.MessageDigest;
+import java.io.File;
 
 public class Hash256 
 {
@@ -28,4 +30,5 @@ public class Hash256
             throw new RuntimeException("Erreur hash SHA-256 : " + e.getMessage());
         }
     }
+
 }

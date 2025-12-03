@@ -19,7 +19,7 @@ import java.sql.ResultSet;
 
 public class UserUi {
 
-    private JFrame frame;
+    private final JFrame frame;
     private final Connection conn;
     private final int userId;
     private final String username;
@@ -31,18 +31,21 @@ public class UserUi {
         this.conn = conn;
         this.userId = userId;
         this.username = UserSession.getUsername();
+
+        frame = new JFrame("Espace Utilisateur - " + username);
+
         initUI();
         loadFiles();
     }
 
+    // ===== INITIALISATION DE L'INTERFACE =====
     private void initUI() {
-
-        frame = new JFrame("Espace Utilisateur - " + username);
         frame.setSize(750, 500);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
         frame.setLayout(new BorderLayout());
 
+        // ===== HEADER =====
         JPanel header = new JPanel();
         header.setBackground(new Color(125, 41, 219));
         header.setPreferredSize(new Dimension(0, 60));
@@ -53,6 +56,7 @@ public class UserUi {
         header.add(title);
         frame.add(header, BorderLayout.NORTH);
 
+        // ===== BOTTOM PANEL =====
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 20));
         bottomPanel.setBackground(Color.WHITE);
 
@@ -60,15 +64,16 @@ public class UserUi {
         uploadBtn.setPreferredSize(new Dimension(200, 45));
         uploadBtn.setBackground(new Color(46, 204, 113));
         uploadBtn.setForeground(Color.WHITE);
-
         bottomPanel.add(uploadBtn);
+
         frame.add(bottomPanel, BorderLayout.SOUTH);
 
         // ===== TABLE =====
         JPanel center = new JPanel(new BorderLayout());
 
-        String[] cols = {"ID User", "Nom du fichier", "Date de signature", "Télécharger"};
+        String[] cols = { "ID User", "Nom du fichier", "Date de signature", "Télécharger" };
         model = new DefaultTableModel(cols, 0) {
+            @Override
             public boolean isCellEditable(int row, int column) {
                 return column == 3; // seule la colonne bouton est éditable
             }
@@ -81,7 +86,7 @@ public class UserUi {
         center.add(new JScrollPane(table), BorderLayout.CENTER);
         frame.add(center, BorderLayout.CENTER);
 
-        // ----- ACTIONS -----
+        // ===== ACTIONS =====
         uploadBtn.addActionListener(e -> doUpload());
 
         frame.setVisible(true);
@@ -96,7 +101,6 @@ public class UserUi {
 
             String sql = "SELECT id_user, file_name, signed_at FROM signature ORDER BY signed_at DESC";
             PreparedStatement ps = conn.prepareStatement(sql);
-
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -118,7 +122,6 @@ public class UserUi {
     private void doUpload() {
         JFileChooser fc = new JFileChooser();
         if (fc.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
-
             File file = fc.getSelectedFile();
             Upload up = new Upload(conn);
 
@@ -127,8 +130,7 @@ public class UserUi {
             JOptionPane.showMessageDialog(frame,
                     ok ? "Upload + signature OK." : "Échec upload",
                     ok ? "Succès" : "Erreur",
-                    ok ? JOptionPane.INFORMATION_MESSAGE : JOptionPane.ERROR_MESSAGE
-            );
+                    ok ? JOptionPane.INFORMATION_MESSAGE : JOptionPane.ERROR_MESSAGE);
 
             if (ok) {
                 loadFiles();
@@ -139,7 +141,6 @@ public class UserUi {
     // ============================
     // CLASSES POUR LE BOUTON TÉLÉCHARGER
     // ============================
-
     class ButtonRenderer extends JButton implements TableCellRenderer {
 
         public ButtonRenderer() {
@@ -149,6 +150,7 @@ public class UserUi {
             setForeground(Color.WHITE);
         }
 
+        @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
                                                        boolean isSelected, boolean hasFocus,
                                                        int row, int col) {
@@ -158,7 +160,7 @@ public class UserUi {
 
     class ButtonEditor extends AbstractCellEditor implements TableCellEditor, ActionListener {
 
-        private JButton button;
+        private final JButton button;
         private String fileName;
         private int fileOwnerId;
 
@@ -169,34 +171,33 @@ public class UserUi {
             button.addActionListener(this);
         }
 
+        @Override
         public Component getTableCellEditorComponent(JTable table, Object value,
                                                      boolean isSelected, int row, int col) {
-
             fileOwnerId = Integer.parseInt(table.getValueAt(row, 0).toString());
             fileName = table.getValueAt(row, 1).toString();
             return button;
         }
 
+        @Override
         public Object getCellEditorValue() {
             return fileName;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-
             JFileChooser fc = new JFileChooser();
             fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
             if (fc.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
                 String folder = fc.getSelectedFile().getAbsolutePath();
-
                 Download dl = new Download(conn);
 
-                boolean ok = dl.downloadFile(fileOwnerId, fileName, folder);
+                String message = dl.downloadFileMessage(fileOwnerId, fileName, folder);
+                boolean ok = message.contains("Téléchargement OK");
 
                 JOptionPane.showMessageDialog(frame,
-                        ok ? "Téléchargement OK + signature valide." :
-                                "Téléchargé mais signature INVALID (sécurité).",
+                        message,
                         ok ? "Succès" : "Alerte",
                         ok ? JOptionPane.INFORMATION_MESSAGE : JOptionPane.WARNING_MESSAGE);
             }

@@ -15,52 +15,63 @@ public class Download {
 
     private Connection conn;
 
-    public Download(Connection conn) 
-    {
+    public Download(Connection conn) {
         this.conn = conn;
     }
 
-    public boolean downloadFile(int idUser, String fileName, String destFolder) {
-
+    public String downloadFileMessage(int idUser, String fileName, String destFolder) {
+        String message;
         try {
-            //Récupérer la signature du fichier
+            // Récupération signature, hash, etc. comme avant...
             String sql = "SELECT file_hash, signatur, public_key FROM signature WHERE file_name=?";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, fileName);
             ResultSet rs = ps.executeQuery();
 
-            if (!rs.next()) throw new Exception("Aucune signature trouvée.");
+            if (!rs.next())
+                throw new Exception("Aucune signature trouvée.");
 
             String hashSaved = rs.getString("file_hash");
             String signature = rs.getString("signatur");
             String publicKeyPEM = rs.getString("public_key");
 
-            //Vérifier signature RSA
             PublicKey publicKey = RSAUtil.loadPublicKey(publicKeyPEM);
 
-            boolean valid = RSAUtil.verify(hashSaved, signature, publicKey);
-
-            //Copier le fichier
-            String srcPath = "storage/files_brut/" + fileName;
-            String destPath = destFolder + "/" + fileName;
-
-            Files.copy(new File(srcPath).toPath(),
-                       new File(destPath).toPath(),
-                       StandardCopyOption.REPLACE_EXISTING);
-
-            //Log
-            logAction("DOWNLOAD", valid ? "SIGNATURE OK" : "SIGNATURE INVALID", idUser, fileName);
-
-            return valid;
-
-        } catch (Exception e) 
-        {
-            try {
-                logAction("DOWNLOAD", "ERROR: " + e.getMessage(), idUser, fileName);
-            } catch (Exception logEx) {
-                System.err.println("Erreur logAction : " + logEx.getMessage());
+            boolean signatureOk = RSAUtil.verify(hashSaved, signature, publicKey);
+            if (!signatureOk) {
+                message = "SIGNATURE CORROMPUE EN BASE";
+                logAction("DOWNLOAD", message, idUser, fileName);
+                return message;
             }
-            return false;
+
+            File currentFile = new File("storage/files_brut/" + fileName);
+            if (!currentFile.exists())
+                throw new Exception("Fichier physique introuvable dans storage.");
+
+            String currentHash = FileHash.computeSHA256(currentFile);
+
+            boolean fileIsIntact = hashSaved.equals(currentHash);
+            if (!fileIsIntact) {
+                message = "FICHIER MODIFIÉ DEPUIS SIGNATURE ! IMPOSSIBLE DE TELECHARGER";
+                logAction("DOWNLOAD", message, idUser, fileName);
+                return message;
+            }
+
+            // Tout est OK
+            Files.copy(currentFile.toPath(), new File(destFolder + "/" + fileName).toPath(),
+                    StandardCopyOption.REPLACE_EXISTING);
+            message = "Téléchargement OK + signature valide.";
+            logAction("DOWNLOAD", "SIGNATURE OK - Fichier intact", idUser, fileName);
+            return message;
+
+        } catch (Exception e) {
+            try {
+                message = "ERREUR: " + e.getMessage();
+                logAction("DOWNLOAD", message, idUser, fileName);
+            } catch (Exception logEx) {
+                message = "Erreur de log : " + logEx.getMessage();
+            }
+            return message;
         }
     }
 
