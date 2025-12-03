@@ -1,15 +1,20 @@
 package dev.ui;
 
 import javax.swing.*;
+
+import dev.back.hash.Hash256;
+import dev.unit.Connexion;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
-public class Login extends JFrame 
-{
+public class Login extends JFrame {
 
-    public Login() 
-    {
+    public Login() {
         super("Authentification");
 
         // --------- GLOBAL ---------
@@ -24,7 +29,7 @@ public class Login extends JFrame
 
         // --------- HEADER ---------
         JPanel header = new JPanel();
-        header.setBackground(new Color(125, 41, 219)); 
+        header.setBackground(new Color(125, 41, 219));
         header.setPreferredSize(new Dimension(500, 70));
 
         JLabel title = new JLabel("Connexion");
@@ -46,7 +51,8 @@ public class Login extends JFrame
         JTextField inputNom = new JTextField(15);
         styleTextField(inputNom);
 
-        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         card.add(labelNom, gbc);
         gbc.gridx = 1;
         card.add(inputNom, gbc);
@@ -56,7 +62,8 @@ public class Login extends JFrame
         JPasswordField inputPass = new JPasswordField(15);
         styleTextField(inputPass);
 
-        gbc.gridx = 0; gbc.gridy = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         card.add(labelPass, gbc);
         gbc.gridx = 1;
         card.add(inputPass, gbc);
@@ -74,14 +81,47 @@ public class Login extends JFrame
             public void mouseEntered(MouseEvent e) {
                 loginButton.setBackground(new Color(30, 105, 200));
             }
+
             public void mouseExited(MouseEvent e) {
                 loginButton.setBackground(new Color(40, 120, 220));
             }
         });
 
-        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2;
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
         card.add(loginButton, gbc);
+
+        loginButton.addActionListener(e -> {
+            String username = inputNom.getText();
+            String password = new String(inputPass.getPassword());
+            String hashed = Hash256.hashPassword(password);
+            try (Connection conn = Connexion.getConnection()) {
+                String sql = "SELECT is_admin FROM User WHERE user_name = ? AND password_hash = ?";
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                stmt.setString(1, username);
+                stmt.setString(2, hashed);
+                ResultSet rs = stmt.executeQuery();
+
+                if (rs.next()) {
+                    int isAdmin = rs.getInt("is_admin");
+                    if (isAdmin == 0) {
+                        new AdminUi();
+                    } else {
+                        new UserUi(); // à créer
+                    }
+                    dispose(); // ferme la fenêtre login
+                } else {
+                    JOptionPane.showMessageDialog(this, "Nom ou mot de passe incorrect.", "Erreur",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Erreur : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+
+        });
 
         // --------- CONTENEUR CENTRAL (pour effet shadow) ---------
         JPanel centerWrapper = new JPanel();
@@ -104,8 +144,7 @@ public class Login extends JFrame
         field.setPreferredSize(new Dimension(200, 30));
         field.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(180, 180, 180)),
-                BorderFactory.createEmptyBorder(5, 10, 5, 10)
-        ));
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)));
         field.setBackground(new Color(250, 250, 250));
     }
 

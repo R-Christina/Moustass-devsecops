@@ -3,14 +3,13 @@ package dev.ui;
 import javax.swing.*;
 import java.awt.*;
 
-public class UserUi 
-{
+public class UserUi {
 
-    public static void main(String[] args) 
-    {
+    private JFrame frame;
 
+    public UserUi() {
         // ===== FENÊTRE =====
-        JFrame frame = new JFrame("Espace Utilisateur");
+        frame = new JFrame("Espace Utilisateur");
         frame.setSize(600, 400);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
@@ -55,5 +54,10 @@ public class UserUi
         frame.add(center, BorderLayout.CENTER);
 
         frame.setVisible(true);
+    }
+
+    // Facultatif : pour lancer directement
+    public static void main(String[] args) {
+        new UserUi();
     }
 }
