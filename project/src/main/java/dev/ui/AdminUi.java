@@ -7,31 +7,25 @@ import javax.swing.*;
 import java.awt.*;
 import java.sql.Connection;
 
-public class AdminUi 
-{
+public class AdminUi {
 
-    public static void main(String[] args) 
-    {
+    private JFrame frame;
+    private JPanel centerPanel;
+    private final Connection conn;
+    private final int adminId;
 
-        // ===== CONNEXION À LA BASE =====
-        final Connection conn; // ⬅ final = corrige le warning
+    // ===== CONSTRUCTEUR OFFICIEL =====
+    public AdminUi(int adminId, Connection conn) {
+        this.adminId = adminId;
+        this.conn = conn;
+        initUI();
+    }
 
-        try 
-        {
-            conn = Connexion.getConnection();
-        } catch (Exception ex) 
-        {
-            JOptionPane.showMessageDialog(
-                    null,
-                    "Impossible de se connecter à la base de données.\n" + ex.getMessage(),
-                    "Erreur",
-                    JOptionPane.ERROR_MESSAGE
-            );
-            return; // stop l'exécution
-        }
+    // ===== INTERFACE =====
+    private void initUI() {
 
         // ===== FENÊTRE =====
-        JFrame frame = new JFrame("Administrateur");
+        frame = new JFrame("Administrateur");
         frame.setSize(900, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
@@ -47,24 +41,10 @@ public class AdminUi
         title.setForeground(Color.WHITE);
         header.add(title, BorderLayout.CENTER);
 
-        // Upload / Download
-        JPanel topRight = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 15));
-        topRight.setOpaque(false);
-
-        JLabel upload = new JLabel("Upload");
-        upload.setForeground(Color.WHITE);
-
-        JLabel download = new JLabel("Download");
-        download.setForeground(Color.WHITE);
-
-        topRight.add(upload);
-        topRight.add(download);
-        header.add(topRight, BorderLayout.EAST);
-
         frame.add(header, BorderLayout.NORTH);
 
         // ===== CENTER PANEL =====
-        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel = new JPanel(new BorderLayout());
         centerPanel.setBackground(Color.WHITE);
         frame.add(centerPanel, BorderLayout.CENTER);
 
@@ -72,10 +52,9 @@ public class AdminUi
         JPanel sidebar = new JPanel();
         sidebar.setPreferredSize(new Dimension(200, 0));
         sidebar.setBackground(new Color(245, 245, 245));
-        sidebar.setLayout(new GridLayout(10, 1, 0, 8));
+        sidebar.setLayout(new GridLayout(10, 1, 0, 10));
         sidebar.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
 
-        // ===== MENU BOUTONS =====
         JButton btnListe = menuButton("Liste Fichiers");
         JButton btnCreateUser = menuButton("Créer Utilisateur");
         JButton btnLogs = menuButton("Logs");
@@ -87,35 +66,30 @@ public class AdminUi
         frame.add(sidebar, BorderLayout.WEST);
 
         // ===== ACTIONS =====
+        btnCreateUser.addActionListener(e -> showPage(new AddUserUi(conn)));
 
-        // --- Page : Créer un utilisateur
-        btnCreateUser.addActionListener(e -> {
-            centerPanel.removeAll();
-            centerPanel.add(new AddUserUi(conn), BorderLayout.CENTER);  // ✔ OK
-            centerPanel.revalidate();
-            centerPanel.repaint();
-        });
-
-        // --- Page : Liste des fichiers
         btnListe.addActionListener(e -> {
-            centerPanel.removeAll();
-            centerPanel.add(new JLabel("Page : Liste des fichiers"), BorderLayout.CENTER);
-            centerPanel.revalidate();
-            centerPanel.repaint();
+            JLabel page = new JLabel("Page : Liste des fichiers", SwingConstants.CENTER);
+            showPage(page);
         });
 
-        // --- Page : Logs
         btnLogs.addActionListener(e -> {
-            centerPanel.removeAll();
-            centerPanel.add(new JLabel("Page : Logs"), BorderLayout.CENTER);
-            centerPanel.revalidate();
-            centerPanel.repaint();
+            JLabel page = new JLabel("Page : Logs", SwingConstants.CENTER);
+            showPage(page);
         });
 
         frame.setVisible(true);
     }
 
-    // ----- STYLE DU MENU -----
+    // ===== CHANGER DE PAGE =====
+    private void showPage(Component comp) {
+        centerPanel.removeAll();
+        centerPanel.add(comp, BorderLayout.CENTER);
+        centerPanel.revalidate();
+        centerPanel.repaint();
+    }
+
+    // ===== STYLE BOUTONS MENUS =====
     private static JButton menuButton(String text) {
         JButton btn = new JButton(text);
         btn.setFocusPainted(false);
@@ -124,5 +98,24 @@ public class AdminUi
         btn.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 10));
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return btn;
+    }
+
+    // ===== MAIN TEMPORAIRE POUR TEST =====
+    public static void main(String[] args) {
+
+        try {
+            Connection conn = Connexion.getConnection();
+            int fakeAdminId = 1; // ID d’admin pour test
+
+            new AdminUi(fakeAdminId, conn);
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Erreur DB : " + ex.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
     }
 }

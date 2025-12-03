@@ -1,6 +1,7 @@
 create database moustass;
 
-create table User(
+create table User
+(
     id_user int auto_increment primary key,
     user_name varchar(255)not null,
     email varchar(255) not null unique,
@@ -13,7 +14,8 @@ create table User(
     updated_at datetime
 );
 
-create table signature(
+create table signature
+(
     id_ignature int auto_increment primary key,
     id_user int not null,
     file_name varchar(255) not null,
@@ -24,7 +26,8 @@ create table signature(
     foreign key (id_user) references User(id_user)
 );
 
-create table logs(
+create table logs
+(
     id_log int auto_increment primary key,
     name_user varchar(255)not null,
     act text not null,
