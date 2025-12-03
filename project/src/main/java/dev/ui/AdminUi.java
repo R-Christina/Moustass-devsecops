@@ -9,97 +9,72 @@ import java.sql.Connection;
 
 public class AdminUi {
 
-    private JFrame frame;
-    private JPanel centerPanel;
-    private Connection conn;
+    private final JFrame frame;
+    private final JPanel centerPanel;
+    private final Connection conn;
+    private final int adminId;
 
-        public AdminUi() {
+    // ===== CONSTRUCTEUR =====
+    public AdminUi(int adminId, Connection conn) {
+        this.adminId = adminId;
+        this.conn = conn;
 
-        // ===== CONNEXION À LA BASE =====
+        frame = new JFrame("Administrateur");
+        centerPanel = new JPanel(new BorderLayout());
 
-        try 
-        {
-            conn = Connexion.getConnection();
-        } catch (Exception ex) 
-        {
-            JOptionPane.showMessageDialog(
-                    null,
-                    "Impossible de se connecter à la base de données.\n" + ex.getMessage(),
-                    "Erreur",
-                    JOptionPane.ERROR_MESSAGE
-            );
-            return; // stop l'exécution
-        }
+        initUI();
+    }
+
+    // ===== INITIALISATION DE L'INTERFACE =====
+    private void initUI() {
 
         // ===== FENÊTRE =====
-        frame=new JFrame("Administrateur");frame.setSize(900,600);frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);frame.setLocationRelativeTo(null);frame.setLayout(new BorderLayout());
+        frame.setSize(900, 600);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
+        frame.setLayout(new BorderLayout());
 
         // ===== HEADER =====
-        JPanel header = new JPanel(
-                new BorderLayout());header.setBackground(new Color(125,41,219));header.setPreferredSize(new Dimension(0,60));
+        JPanel header = new JPanel(new BorderLayout());
+        header.setBackground(new Color(125, 41, 219));
+        header.setPreferredSize(new Dimension(0, 60));
 
-        JLabel title = new JLabel("Admin",
-                SwingConstants.CENTER);title.setFont(new Font("Segoe UI",Font.BOLD,22));title.setForeground(Color.WHITE);header.add(title,BorderLayout.CENTER);
+        JLabel title = new JLabel("Admin", SwingConstants.CENTER);
+        title.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        title.setForeground(Color.WHITE);
 
-        // Upload / Download
-        JPanel topRight = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 15));topRight.setOpaque(false);
-
-        JLabel upload = new JLabel("Upload");upload.setForeground(Color.WHITE);
-
-        JLabel download = new JLabel("Download");download.setForeground(Color.WHITE);
-
-        topRight.add(upload);topRight.add(download);header.add(topRight,BorderLayout.EAST);
-
-        frame.add(header,BorderLayout.NORTH);
+        header.add(title, BorderLayout.CENTER);
+        frame.add(header, BorderLayout.NORTH);
 
         // ===== CENTER PANEL =====
-        JPanel centerPanel = new JPanel(
-                new BorderLayout());centerPanel.setBackground(Color.WHITE);frame.add(centerPanel,BorderLayout.CENTER);
+        centerPanel.setBackground(Color.WHITE);
+        frame.add(centerPanel, BorderLayout.CENTER);
 
         // ===== SIDEBAR =====
-        JPanel sidebar = new JPanel();sidebar.setPreferredSize(new Dimension(200,0));sidebar.setBackground(new Color(245,245,245));sidebar.setLayout(new GridLayout(10,1,0,8));sidebar.setBorder(BorderFactory.createEmptyBorder(20,10,20,10));
+        JPanel sidebar = new JPanel(new GridLayout(10, 1, 0, 10));
+        sidebar.setPreferredSize(new Dimension(200, 0));
+        sidebar.setBackground(new Color(245, 245, 245));
+        sidebar.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
 
-        // ===== MENU BOUTONS =====
         JButton btnListe = menuButton("Liste Fichiers");
         JButton btnCreateUser = menuButton("Créer Utilisateur");
         JButton btnLogs = menuButton("Logs");
 
-        sidebar.add(btnListe);sidebar.add(btnCreateUser);sidebar.add(btnLogs);
+        sidebar.add(btnListe);
+        sidebar.add(btnCreateUser);
+        sidebar.add(btnLogs);
 
-        frame.add(sidebar,BorderLayout.WEST);
+        frame.add(sidebar, BorderLayout.WEST);
 
         // ===== ACTIONS =====
-
-        // --- Page : Créer un utilisateur
-        btnCreateUser.addActionListener(e->
-        {
-            centerPanel.removeAll();
-            centerPanel.add(new AddUserUi(conn), BorderLayout.CENTER); // ✔ OK
-            centerPanel.revalidate();
-            centerPanel.repaint();
-        });
-
-        // --- Page : Liste des fichiers
-        btnListe.addActionListener(e->
-        {
-            centerPanel.removeAll();
-            centerPanel.add(new JLabel("Page : Liste des fichiers"), BorderLayout.CENTER);
-            centerPanel.revalidate();
-            centerPanel.repaint();
-        });
-
-        // --- Page : Logs
-        btnLogs.addActionListener(e->
-        {
-            centerPanel.removeAll();
-            centerPanel.add(new JLabel("Page : Logs"), BorderLayout.CENTER);
-            centerPanel.revalidate();
-            centerPanel.repaint();
-        });
+        btnCreateUser.addActionListener(e -> showPage(new AddUserUi(conn)));
+        btnListe.addActionListener(e -> showPage(new FilesUi(conn)));
+        btnLogs.addActionListener(e -> showPage(new LogsUi(conn)));
 
         frame.setVisible(true);
     }
 
+    // ===== CHANGER DE PAGE =====
     private void showPage(Component comp) {
         centerPanel.removeAll();
         centerPanel.add(comp, BorderLayout.CENTER);
@@ -107,7 +82,7 @@ public class AdminUi {
         centerPanel.repaint();
     }
 
-    // ----- STYLE DU MENU -----
+    // ===== STYLE BOUTONS MENUS =====
     private static JButton menuButton(String text) {
         JButton btn = new JButton(text);
         btn.setFocusPainted(false);
@@ -118,14 +93,20 @@ public class AdminUi {
         return btn;
     }
 
-    private JLabel label(String text) {
-        JLabel lbl = new JLabel(text);
-        lbl.setForeground(Color.WHITE);
-        return lbl;
-    }
-
-    // Facultatif : permet de lancer directement
+    // ===== MAIN DE TEST =====
     public static void main(String[] args) {
-        new AdminUi();
+        try {
+            Connection conn = Connexion.getConnection();
+            int fakeAdminId = 1; // ID d’admin pour test
+            new AdminUi(fakeAdminId, conn);
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Erreur DB : " + ex.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
     }
 }
