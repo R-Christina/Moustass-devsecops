@@ -20,14 +20,25 @@
     <jacoco.version>0.8.12</jacoco.version>
   </properties>
 
-  <dependencies>
+<dependencies>
+
+    <!-- Tests JUnit -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.11</version>
-      <scope>test</scope>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.11</version>
+        <scope>test</scope>
     </dependency>
-  </dependencies>
+
+    <!-- Driver JDBC MySQL (OBLIGATOIRE pour éviter l’erreur “No suitable driver”) -->
+    <dependency>
+    <groupId>com.mysql</groupId>
+    <artifactId>mysql-connector-j</artifactId>
+    <version>9.3.0</version>
+    </dependency>
+
+</dependencies>
+
 
   <build>
     <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
