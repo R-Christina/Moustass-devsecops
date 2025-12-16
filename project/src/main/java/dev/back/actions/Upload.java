@@ -38,7 +38,7 @@ public class Upload {
             File keyFile = new File(privateKeyPath);
             if (!keyFile.exists()) {
                 System.err.println("ERREUR : Clé privée introuvable : " + privateKeyPath);
-                logAction("UPLOAD", "ERROR: private key missing", idUser, chosenFile.getName());
+                LoggerUtil.log(conn,"UPLOAD", "ERROR: private key missing", idUser, chosenFile.getName());
                 return false;
             }
 
@@ -55,7 +55,7 @@ public class Upload {
                 try (ResultSet rs = psKey.executeQuery()) {
                     if (!rs.next()) {
                         System.err.println("ERREUR : Aucun utilisateur trouvé !");
-                        logAction("UPLOAD", "ERROR: user not found", idUser, chosenFile.getName());
+                        LoggerUtil.log(conn,"UPLOAD", "ERROR: user not found", idUser, chosenFile.getName());
                         return false;
                     }
                     publicKeyPEM = rs.getString("public_key");
@@ -75,45 +75,13 @@ public class Upload {
             }
 
             // === Log OK ===
-            logAction("UPLOAD", "OK", idUser, chosenFile.getName());
+            LoggerUtil.log(conn, "UPLOAD", "OK", idUser, chosenFile.getName());
 
             return true;
 
         } catch (Exception e) {
-            e.printStackTrace();
-            logAction("UPLOAD", "ERROR: " + e.getMessage(), idUser, chosenFile.getName());
+            LoggerUtil.log(conn, "UPLOAD", "ERROR: " + e.getMessage(), idUser, chosenFile.getName());
             return false;
-        }
-    }
-
-    // ======================================================
-    // LOG SANS throws Exception (aucune erreur bloquante)
-    // ======================================================
-    private void logAction(String action, String result, int idUser, String fileName) {
-        String username = "Unknown";
-
-        // Récupérer nom du user
-        String sqlUser = "SELECT user_name FROM User WHERE id_user=?";
-        try (PreparedStatement psUser = conn.prepareStatement(sqlUser)) {
-            psUser.setInt(1, idUser);
-            try (ResultSet rs = psUser.executeQuery()) {
-                if (rs.next()) {
-                    username = rs.getString("user_name");
-                }
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace(); // On ne stoppe jamais l'upload pour un log
-        }
-
-        // Insérer dans les logs
-        String sqlLog = "INSERT INTO logs (name_user, act, date_time, result) VALUES (?, ?, NOW(), ?)";
-        try (PreparedStatement psLog = conn.prepareStatement(sqlLog)) {
-            psLog.setString(1, username);
-            psLog.setString(2, action + " fichier : " + fileName);
-            psLog.setString(3, result);
-            psLog.executeUpdate();
-        } catch (Exception ex) {
-            ex.printStackTrace(); // On ne stoppe jamais l'upload pour un log
         }
     }
 }
