@@ -14,7 +14,7 @@ import java.sql.ResultSet;
 public class Download {
 
     private Connection conn;
-    public static final String DOWNLOAD = "DOWNLOAD";
+    public static final String download_name = "DOWNLOAD";
 
     public Download(Connection conn) {
         this.conn = conn;
@@ -39,7 +39,7 @@ public class Download {
                     boolean signatureOk = RSAUtil.verify(hashSaved, signature, publicKey);
                     if (!signatureOk) {
                         message = "SIGNATURE CORROMPUE EN BASE";
-                        LoggerUtil.log(conn, DOWNLOAD, message, idUser, fileName);
+                        LoggerUtil.log(conn, download_name, message, idUser, fileName);
                         return message;
                     }
 
@@ -50,7 +50,7 @@ public class Download {
                     String currentHash = FileHash.computeSHA256(currentFile);
                     if (!hashSaved.equals(currentHash)) {
                         message = "FICHIER MODIFIÉ DEPUIS SIGNATURE ! IMPOSSIBLE DE TELECHARGER";
-                        LoggerUtil.log(conn, DOWNLOAD, message, idUser, fileName);
+                        LoggerUtil.log(conn, download_name, message, idUser, fileName);
                         return message;
                     }
 
@@ -58,14 +58,14 @@ public class Download {
                     Files.copy(currentFile.toPath(), new File(destFolder + "/" + fileName).toPath(),
                             StandardCopyOption.REPLACE_EXISTING);
                     message = "Téléchargement OK + signature valide.";
-                    LoggerUtil.log(conn, DOWNLOAD, "SIGNATURE OK - Fichier intact", idUser, fileName);
+                    LoggerUtil.log(conn, download_name, "SIGNATURE OK - Fichier intact", idUser, fileName);
                     return message;
                 }
             }
 
         } catch (Exception e) {
             message = "ERREUR: " + e.getMessage();
-            LoggerUtil.log(conn, DOWNLOAD, message, idUser, fileName);
+            LoggerUtil.log(conn, download_name, message, idUser, fileName);
             return message;
         }
     }
