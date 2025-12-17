@@ -14,7 +14,6 @@ public class Connexion {
     {
         try 
         {
-            System.out.println("DB_PASSWORD = " + System.getenv("DB_PASSWORD"));
             return DriverManager.getConnection(URL, USER, PASSWORD);
 
         } catch (SQLException e) 

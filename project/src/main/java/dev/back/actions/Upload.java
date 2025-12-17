@@ -14,7 +14,7 @@ import java.sql.ResultSet;
 public class Upload {
 
     private final Connection conn;
-    public static final String UPLOAD = "UPLOAD";
+    public static final String upload_name = "UPLOAD";
 
     public Upload(Connection conn) {
         this.conn = conn;
@@ -39,7 +39,7 @@ public class Upload {
             File keyFile = new File(privateKeyPath);
             if (!keyFile.exists()) {
                 System.err.println("ERREUR : Clé privée introuvable : " + privateKeyPath);
-                LoggerUtil.log(conn,UPLOAD, "ERROR: private key missing", idUser, chosenFile.getName());
+                LoggerUtil.log(conn,upload_name, "ERROR: private key missing", idUser, chosenFile.getName());
                 return false;
             }
 
@@ -56,7 +56,7 @@ public class Upload {
                 try (ResultSet rs = psKey.executeQuery()) {
                     if (!rs.next()) {
                         System.err.println("ERREUR : Aucun utilisateur trouvé !");
-                        LoggerUtil.log(conn,UPLOAD, "ERROR: user not found", idUser, chosenFile.getName());
+                        LoggerUtil.log(conn,upload_name, "ERROR: user not found", idUser, chosenFile.getName());
                         return false;
                     }
                     publicKeyPEM = rs.getString("public_key");
@@ -76,12 +76,12 @@ public class Upload {
             }
 
             // === Log OK ===
-            LoggerUtil.log(conn, UPLOAD, "OK", idUser, chosenFile.getName());
+            LoggerUtil.log(conn, upload_name, "OK", idUser, chosenFile.getName());
 
             return true;
 
         } catch (Exception e) {
-            LoggerUtil.log(conn, UPLOAD, "ERROR: " + e.getMessage(), idUser, chosenFile.getName());
+            LoggerUtil.log(conn, upload_name, "ERROR: " + e.getMessage(), idUser, chosenFile.getName());
             return false;
         }
     }
