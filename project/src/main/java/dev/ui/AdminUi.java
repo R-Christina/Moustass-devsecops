@@ -6,6 +6,8 @@ import dev.unit.Connexion;
 import javax.swing.*;
 import java.awt.*;
 import java.sql.Connection;
+import javax.swing.WindowConstants;
+
 
 public class AdminUi {
 
@@ -30,7 +32,7 @@ public class AdminUi {
 
         // ===== FENÊTRE =====
         frame.setSize(900, 600);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
         frame.setLayout(new BorderLayout());
 

@@ -1,11 +1,12 @@
 
 package dev.ui;
 
-import javax.swing.*;
-import java.awt.*;
-import javax.swing.JFrame;
 // import javax.swing.JScrollPane;
 // import javax.swing.JTable;
+import javax.swing.*;
+import java.awt.*;
+import javax.swing.WindowConstants;
+
 
 public class Admin {
     
@@ -15,7 +16,7 @@ public class Admin {
         // ===== FENÊTRE PRINCIPALE =====
         JFrame frame = new JFrame("Administrateur");
         frame.setSize(600, 480);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
         frame.getContentPane().setBackground(new Color(245, 245, 245)); // fond doux
         frame.setLayout(new BorderLayout());
