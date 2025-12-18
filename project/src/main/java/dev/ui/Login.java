@@ -15,6 +15,8 @@ import java.sql.ResultSet;
 
 public class Login extends JFrame {
 
+    private static final String TYPO = "Segoe UI";
+
     public Login() {
         super("Authentification");
 
@@ -24,8 +26,8 @@ public class Login extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
 
-        UIManager.put("Label.font", new Font("Segoe UI", Font.PLAIN, 14));
-        UIManager.put("Button.font", new Font("Segoe UI", Font.BOLD, 14));
+        UIManager.put("Label.font", new Font(TYPO, Font.PLAIN, 14));
+        UIManager.put("Button.font", new Font(TYPO, Font.BOLD, 14));
 
         // --------- HEADER ---------
         JPanel header = new JPanel();
@@ -33,7 +35,7 @@ public class Login extends JFrame {
         header.setPreferredSize(new Dimension(500, 70));
 
         JLabel title = new JLabel("Connexion");
-        title.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        title.setFont(new Font(TYPO, Font.BOLD, 22));
         title.setForeground(Color.WHITE);
         header.add(title);
 

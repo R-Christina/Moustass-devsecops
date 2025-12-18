@@ -3,8 +3,6 @@ package dev.ui;
 import dev.back.actions.Upload;
 import dev.back.actions.Download;
 import dev.back.session.UserSession;
-import dev.ui.UserUi.ButtonEditor;
-import dev.ui.UserUi.ButtonRenderer;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -76,7 +74,7 @@ public class UserUi {
         // ===== TABLE =====
         JPanel center = new JPanel(new BorderLayout());
 
-        String[] cols = { "ID User", "Nom du fichier", "Date de signature", "TELECHARGER_TEXT" };
+        String[] cols = { "ID User", "Nom du fichier", "Date de signature", TELECHARGER_TEXT };
         model = new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -85,8 +83,8 @@ public class UserUi {
         };
 
         table = new JTable(model);
-        table.getColumn("TELECHARGER_TEXT").setCellRenderer(new ButtonRenderer());
-        table.getColumn("TELECHARGER_TEXT").setCellEditor(new ButtonEditor());
+        table.getColumn(TELECHARGER_TEXT).setCellRenderer(new ButtonRenderer());
+        table.getColumn(TELECHARGER_TEXT).setCellEditor(new ButtonEditor());
 
         center.add(new JScrollPane(table), BorderLayout.CENTER);
         frame.add(center, BorderLayout.CENTER);
