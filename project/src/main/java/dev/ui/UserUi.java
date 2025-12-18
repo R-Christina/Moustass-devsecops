@@ -3,6 +3,8 @@ package dev.ui;
 import dev.back.actions.Upload;
 import dev.back.actions.Download;
 import dev.back.session.UserSession;
+import dev.ui.UserUi.ButtonEditor;
+import dev.ui.UserUi.ButtonRenderer;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -111,7 +113,7 @@ public class UserUi {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Erreur survenue", e);
         }
     }
 

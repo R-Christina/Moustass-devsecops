@@ -8,6 +8,11 @@ import java.util.logging.Logger;
 
 
 public class LoggerUtil {
+    
+    private LoggerUtil() {
+        // Empêche l'instanciation
+    }
+
     private static final Logger logger = Logger.getLogger(LoggerUtil.class.getName());
 
     public static void log(Connection conn, String action, String result, int idUser, String fileName) {
