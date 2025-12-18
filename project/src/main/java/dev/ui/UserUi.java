@@ -18,6 +18,7 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import javax.swing.WindowConstants;
 
 public class UserUi {
 
@@ -25,6 +26,8 @@ public class UserUi {
     private final Connection conn;
     private final int userId;
     private final String username;
+    private static final String DOWNLOAD_TEXT = "Download";
+    private static final String TELECHARGER_TEXT = "Télécharger";
 
     private JTable table;
     private DefaultTableModel model;
@@ -43,7 +46,7 @@ public class UserUi {
     // ===== INITIALISATION DE L'INTERFACE =====
     private void initUI() {
         frame.setSize(750, 500);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
         frame.setLayout(new BorderLayout());
 
@@ -73,7 +76,7 @@ public class UserUi {
         // ===== TABLE =====
         JPanel center = new JPanel(new BorderLayout());
 
-        String[] cols = { "ID User", "Nom du fichier", "Date de signature", "Télécharger" };
+        String[] cols = { "ID User", "Nom du fichier", "Date de signature", "TELECHARGER_TEXT" };
         model = new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -82,8 +85,8 @@ public class UserUi {
         };
 
         table = new JTable(model);
-        table.getColumn("Télécharger").setCellRenderer(new ButtonRenderer());
-        table.getColumn("Télécharger").setCellEditor(new ButtonEditor());
+        table.getColumn("TELECHARGER_TEXT").setCellRenderer(new ButtonRenderer());
+        table.getColumn("TELECHARGER_TEXT").setCellEditor(new ButtonEditor());
 
         center.add(new JScrollPane(table), BorderLayout.CENTER);
         frame.add(center, BorderLayout.CENTER);
@@ -109,7 +112,7 @@ public class UserUi {
                 String name = rs.getString("file_name");
                 String date = rs.getString("signed_at");
 
-                model.addRow(new Object[] { uid, name, date, "Download" });
+                model.addRow(new Object[] { uid, name, date, DOWNLOAD_TEXT });
             }
 
         } catch (Exception e) {
@@ -146,7 +149,7 @@ public class UserUi {
 
         public ButtonRenderer() {
             setOpaque(true);
-            setText("Download");
+            setText(DOWNLOAD_TEXT);
             setBackground(new Color(41, 128, 185));
             setForeground(Color.WHITE);
         }
@@ -166,7 +169,7 @@ public class UserUi {
         private int fileOwnerId;
 
         public ButtonEditor() {
-            button = new JButton("Download");
+            button = new JButton(DOWNLOAD_TEXT);
             button.setBackground(new Color(41, 128, 185));
             button.setForeground(Color.WHITE);
             button.addActionListener(this);
