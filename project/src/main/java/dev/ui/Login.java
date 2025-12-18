@@ -136,7 +136,7 @@ public class Login extends JFrame {
                 dispose();
 
             } catch (Exception ex) {
-                ex.printStackTrace();
+                // ex.printStackTrace();
                 JOptionPane.showMessageDialog(this,
                         "Erreur : " + ex.getMessage(),
                         "Erreur système",
