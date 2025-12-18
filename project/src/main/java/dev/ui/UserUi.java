@@ -96,19 +96,18 @@ public class UserUi {
     // CHARGER LES FICHIERS DE LA BDD
     // ============================
     private void loadFiles() {
-        try {
-            model.setRowCount(0);
+        model.setRowCount(0);
 
-            String sql = "SELECT id_user, file_name, signed_at FROM signature ORDER BY signed_at DESC";
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
+        String sql = "SELECT id_user, file_name, signed_at FROM signature ORDER BY signed_at DESC";
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 int uid = rs.getInt("id_user");
                 String name = rs.getString("file_name");
                 String date = rs.getString("signed_at");
 
-                model.addRow(new Object[]{uid, name, date, "Download"});
+                model.addRow(new Object[] { uid, name, date, "Download" });
             }
 
         } catch (Exception e) {
@@ -152,8 +151,8 @@ public class UserUi {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                                                       boolean isSelected, boolean hasFocus,
-                                                       int row, int col) {
+                boolean isSelected, boolean hasFocus,
+                int row, int col) {
             return this;
         }
     }
@@ -173,7 +172,7 @@ public class UserUi {
 
         @Override
         public Component getTableCellEditorComponent(JTable table, Object value,
-                                                     boolean isSelected, int row, int col) {
+                boolean isSelected, int row, int col) {
             fileOwnerId = Integer.parseInt(table.getValueAt(row, 0).toString());
             fileName = table.getValueAt(row, 1).toString();
             return button;
